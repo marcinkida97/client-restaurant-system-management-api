@@ -1,0 +1,19 @@
+version: '4'
+
+services:
+  db:
+    container_name: client-restaurant-system-management
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: super_admin
+      POSTGRES_PASSWORD: mysecretpassword
+      PGDATA: /data/client-restaurant-system-management
+      POSTGRES_DB: client-restaurant-system-management
+    volumes:
+      - postgres-db:/data/client-restaurant-system-management
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-db:
+    driver: local
