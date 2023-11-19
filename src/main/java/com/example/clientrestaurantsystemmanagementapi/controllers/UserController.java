@@ -1,7 +1,9 @@
 package com.example.clientrestaurantsystemmanagementapi.controllers;
 
-import com.example.clientrestaurantsystemmanagementapi.entities.RegistrationRequest;
-import com.example.clientrestaurantsystemmanagementapi.entities.UserLoginData;
+import com.example.clientrestaurantsystemmanagementapi.models.requests.LoginRequest;
+import com.example.clientrestaurantsystemmanagementapi.models.requests.RegistrationRequest;
+import com.example.clientrestaurantsystemmanagementapi.models.UserLoginData;
+import com.example.clientrestaurantsystemmanagementapi.models.responses.UserResponse;
 import com.example.clientrestaurantsystemmanagementapi.repositories.UserLoginDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,9 +34,12 @@ public class UserController {
         try {
             UserLoginData _userLoginData = userLoginDataRepository
                     .save(new UserLoginData(
-                            registrationRequest.getLogin(),
+                            registrationRequest.getFirstname(),
+                            registrationRequest.getLastname(),
+                            registrationRequest.getEmail(),
                             hashPassword(registrationRequest.getPassword(), salt),
-                            salt
+                            salt,
+                            registrationRequest.getRole()
                     ));
 
             return new ResponseEntity<>("Registration successful", HttpStatus.OK);
@@ -43,22 +48,31 @@ public class UserController {
         }
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<UserLoginData> login(@RequestParam() String login, String password) {
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(@RequestBody() LoginRequest loginRequest) {
 
         UserLoginData userLoginData;
 
         try {
-            userLoginData = userLoginDataRepository.findByLogin(login);
+            userLoginData = userLoginDataRepository.findByEmail(loginRequest.getEmail());
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        String encryptedPassword = hashPassword(password, userLoginData.getSalt());
+        String encryptedPassword = hashPassword(loginRequest.getPassword(), userLoginData.getSalt());
 
         if (!encryptedPassword.equals(userLoginData.getPassword())) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(null, HttpStatus.OK);
+
+        UserResponse userResponse = new UserResponse(
+                userLoginData.getUserLoginDataId(),
+                userLoginData.getFirstname(),
+                userLoginData.getLastname(),
+                userLoginData.getEmail(),
+                userLoginData.getRole()
+        );
+
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 }

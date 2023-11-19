@@ -1,4 +1,4 @@
-package com.example.clientrestaurantsystemmanagementapi.entities;
+package com.example.clientrestaurantsystemmanagementapi.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,10 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.UUID;
 
@@ -24,8 +26,17 @@ public class UserLoginData {
     private UUID userLoginDataId;
 
     @NonNull
-    @Column(name = "login")
-    private String login;
+    @Column(name = "firstname")
+    private String firstname;
+
+    @NonNull
+    @Column(name = "lastname")
+    private String lastname;
+
+    @NonNull
+    @Column(name = "email", unique = true)
+    @Email
+    private String email;
 
     @NonNull
     @Column(name = "password")
@@ -34,4 +45,8 @@ public class UserLoginData {
     @NonNull
     @Column(name = "salt")
     private String salt;
+
+    @NonNull
+    @Column(name = "role")
+    private String role;
 }
