@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.example.clientrestaurantsystemmanagementapi.utils.PasswordUtils.generateSalt;
@@ -49,20 +47,20 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody() LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody() LoginRequest loginRequest) {
 
         UserLoginData userLoginData;
 
         try {
             userLoginData = userLoginDataRepository.findByEmail(loginRequest.getEmail());
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Wrong email", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         String encryptedPassword = hashPassword(loginRequest.getPassword(), userLoginData.getSalt());
 
         if (!encryptedPassword.equals(userLoginData.getPassword())) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Wrong password", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         UserResponse userResponse = new UserResponse(
