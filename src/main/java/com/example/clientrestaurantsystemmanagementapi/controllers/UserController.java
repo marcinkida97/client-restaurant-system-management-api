@@ -3,6 +3,7 @@ package com.example.clientrestaurantsystemmanagementapi.controllers;
 import com.example.clientrestaurantsystemmanagementapi.models.requests.LoginRequest;
 import com.example.clientrestaurantsystemmanagementapi.models.requests.RegistrationRequest;
 import com.example.clientrestaurantsystemmanagementapi.models.UserLoginData;
+import com.example.clientrestaurantsystemmanagementapi.models.responses.ErrorResponse;
 import com.example.clientrestaurantsystemmanagementapi.models.responses.UserResponse;
 import com.example.clientrestaurantsystemmanagementapi.repositories.UserLoginDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +41,9 @@ public class UserController {
                             registrationRequest.getRole()
                     ));
 
-            return new ResponseEntity<>("Registration successful", HttpStatus.OK);
+            return new ResponseEntity<>(new ErrorResponse("Registration successful"), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error during registration: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ErrorResponse("Error during registration"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -54,13 +55,13 @@ public class UserController {
         try {
             userLoginData = userLoginDataRepository.findByEmail(loginRequest.getEmail());
         } catch (Exception e) {
-            return new ResponseEntity<>("Wrong email", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ErrorResponse("Wrong email"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         String encryptedPassword = hashPassword(loginRequest.getPassword(), userLoginData.getSalt());
 
         if (!encryptedPassword.equals(userLoginData.getPassword())) {
-            return new ResponseEntity<>("Wrong password", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ErrorResponse("Wrong password"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         UserResponse userResponse = new UserResponse(
